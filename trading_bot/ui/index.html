@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Futures Testnet Trading Bot</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-rocket brand-icon"></i>
+                <span class="brand-name">Antigravity Bot</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="view-dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="#" class="nav-item" data-target="view-orders"><i class="fa-solid fa-list-check"></i> Active Orders</a>
+                <a href="#" class="nav-item" data-target="view-history"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+                <a href="#" class="nav-item" data-target="view-settings"><i class="fa-solid fa-gears"></i> Settings</a>
+            </nav>
+            <div class="user-profile">
+                <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                <div class="user-info">
+                    <span class="name">Developer Mode</span>
+                    <span class="status">Testnet Mode</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-title">
+                    <h1 id="page-title">Trading Dashboard</h1>
+                    <p class="subtitle" id="page-subtitle">Binance Futures (USDT-M) Testnet Gateway</p>
+                </div>
+                <div class="header-actions">
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span>
+                        <span class="status-text">Connected to Testnet</span>
+                    </div>
+                    <button class="btn btn-secondary" id="sync-time-btn">
+                        <i class="fa-solid fa-rotate"></i> Sync Server Time
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD VIEW -->
+            <div id="view-dashboard" class="tab-view">
+                <div class="dashboard-grid">
+                    <!-- Column 1: Order Placement -->
+                    <div class="grid-column">
+                        <!-- Order Configuration Form -->
+                        <div class="card order-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-paper-plane text-cyan"></i> New Order Placement</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="order-form">
+                                    <!-- Side selector: BUY / SELL -->
+                                    <div class="side-selector">
+                                        <input type="radio" name="side" id="side-buy" value="BUY" checked>
+                                        <label for="side-buy" class="label-buy">
+                                            <i class="fa-solid fa-circle-arrow-up"></i> BUY (LONG)
+                                        </label>
+                                        
+                                        <input type="radio" name="side" id="side-sell" value="SELL">
+                                        <label for="side-sell" class="label-sell">
+                                            <i class="fa-solid fa-circle-arrow-down"></i> SELL (SHORT)
+                                        </label>
+                                    </div>
+
+                                    <!-- Symbol Selector -->
+                                    <div class="input-group">
+                                        <label for="symbol">Trading Pair (USDT-M)</label>
+                                        <div class="select-wrapper">
+                                            <select id="symbol" name="symbol">
+                                                <option value="BTCUSDT">BTCUSDT (Bitcoin)</option>
+                                                <option value="ETHUSDT">ETHUSDT (Ethereum)</option>
+                                                <option value="SOLUSDT">SOLUSDT (Solana)</option>
+                                                <option value="ADAUSDT">ADAUSDT (Cardano)</option>
+                                                <option value="XRPUSDT">XRPUSDT (Ripple)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Order Type Selector -->
+                                    <div class="input-group">
+                                        <label for="order-type">Order Type</label>
+                                        <div class="select-wrapper">
+                                            <select id="order-type" name="order-type">
+                                                <option value="MARKET">MARKET</option>
+                                                <option value="LIMIT">LIMIT</option>
+                                                <option value="STOP_MARKET">STOP MARKET</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quantity Input -->
+                                    <div class="input-group">
+                                        <label for="quantity">Quantity</label>
+                                        <input type="number" id="quantity" name="quantity" step="0.001" min="0.001" placeholder="e.g. 0.001" required>
+                                    </div>
+
+                                    <!-- Dynamic Price Fields -->
+                                    <div class="input-group d-none" id="price-container">
+                                        <label for="price">Limit Price (USDT)</label>
+                                        <input type="number" id="price" name="price" step="0.01" min="0.01" placeholder="e.g. 95000.00">
+                                    </div>
+
+                                    <div class="input-group d-none" id="stop-price-container">
+                                        <label for="stop-price">Stop Trigger Price (USDT)</label>
+                                        <input type="number" id="stop-price" name="stop-price" step="0.01" min="0.01" placeholder="e.g. 90000.00">
+                                    </div>
+
+                                    <!-- Execution Button -->
+                                    <button type="submit" class="btn btn-primary btn-block btn-buy-active" id="submit-order-btn">
+                                        Place BUY MARKET Order
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Logs & Mini Tables -->
+                    <div class="grid-column">
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <span class="stat-label">Connection Status</span>
+                                <span class="stat-value text-green">Online</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Testnet API Latency</span>
+                                <span class="stat-value text-cyan" id="ping-latency">32 ms</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Server Time Offset</span>
+                                <span class="stat-value text-yellow" id="time-offset">-145 ms</span>
+                            </div>
+                        </div>
+
+                        <!-- Console Card (Pinned here for visibility) -->
+                        <div class="card console-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-terminal text-green"></i> Live System Execution Logs</h3>
+                                <button class="btn btn-text text-muted" id="clear-console-btn">Clear Logs</button>
+                            </div>
+                            <div class="card-body console-body" id="console-output">
+                                <div class="log-line log-info">[2026-07-15 16:10:00] [INFO] [trading_bot] Logging configured. Log file initialized.</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:05] [INFO] [trading_bot] Initializing order manager...</div>
+                                <div class="log-line log-debug">[2026-07-15 16:10:06] [DEBUG] [trading_bot.orders] Validating order parameters...</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:06] [INFO] [trading_bot.orders] Validation passed for BUY MARKET order on BTCUSDT. Qty: 0.001</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:06] [INFO] [trading_bot.client] HTTP Request: POST /fapi/v1/order | Params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': '0.001', 'signature': '[REDACTED]'}</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:06] [INFO] [trading_bot.client] HTTP Response: Status 200 | Order Placed. ID: 1572183921, Status: FILLED, Avg Price: $95,250.40</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:15] [INFO] [trading_bot] Initializing order manager...</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:15] [INFO] [trading_bot.orders] Validation passed for BUY LIMIT order on BTCUSDT. Qty: 0.002, Price: 94000.0</div>
+                                <div class="log-line log-info">[2026-07-15 16:10:16] [INFO] [trading_bot.client] HTTP Response: Status 200 | Order Placed. ID: 1572184105, Status: NEW, Price: $94,000.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ACTIVE ORDERS VIEW -->
+            <div id="view-orders" class="tab-view d-none">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-list-check text-yellow"></i> Open Active Orders</h3>
+                        <span class="count-badge" id="open-orders-count">1</span>
+                    </div>
+                    <div class="card-body no-padding table-responsive">
+                        <table class="data-table" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Type</th>
+                                    <th>Side</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="empty-row" class="d-none">
+                                    <td colspan="6" class="text-center" style="padding: 40px; color: var(--text-muted);">
+                                        <i class="fa-solid fa-folder-open" style="font-size: 32px; display: block; margin-bottom: 12px;"></i>
+                                        No active open orders
+                                    </td>
+                                </tr>
+                                <tr id="demo-order-row">
+                                    <td class="symbol-col">BTCUSDT</td>
+                                    <td><span class="badge-type">LIMIT</span></td>
+                                    <td><span class="text-green text-bold">BUY</span></td>
+                                    <td>0.002</td>
+                                    <td>$94,000.00</td>
+                                    <td>
+                                        <button class="btn btn-icon btn-cancel" onclick="cancelOrder(this)">
+                                            <i class="fa-solid fa-trash-can"></i> Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: HISTORY VIEW -->
+            <div id="view-history" class="tab-view d-none">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-clock-rotate-left text-green"></i> Order History Log</h3>
+                        <button class="btn btn-text text-muted" id="clear-history-btn">Clear History</button>
+                    </div>
+                    <div class="card-body no-padding table-responsive">
+                        <table class="data-table" id="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Symbol</th>
+                                    <th>Type</th>
+                                    <th>Side</th>
+                                    <th>Qty</th>
+                                    <th>Filled/Limit Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2026-07-15 16:10:06</td>
+                                    <td class="symbol-col">BTCUSDT</td>
+                                    <td>MARKET</td>
+                                    <td><span class="text-green text-bold">BUY</span></td>
+                                    <td>0.001</td>
+                                    <td>$95,250.40</td>
+                                    <td><span class="badge badge-success">FILLED</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2026-07-15 15:45:12</td>
+                                    <td class="symbol-col">ETHUSDT</td>
+                                    <td>LIMIT</td>
+                                    <td><span class="text-red text-bold">SELL</span></td>
+                                    <td>0.500</td>
+                                    <td>$3,450.00</td>
+                                    <td><span class="badge" style="background-color: rgba(255, 61, 0, 0.1); color: var(--color-red); border: 1px solid rgba(255, 61, 0, 0.2);">CANCELLED</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SETTINGS VIEW -->
+            <div id="view-settings" class="tab-view d-none">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-gears text-blue"></i> Settings & Configurations</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Credentials Settings -->
+                        <div class="input-group">
+                            <label>Binance Testnet API Key</label>
+                            <input type="text" id="settings-api-key" placeholder="Enter API Key..." value="loaded_from_env_file_key">
+                        </div>
+                        <div class="input-group">
+                            <label>Binance Testnet API Secret</label>
+                            <input type="password" id="settings-api-secret" placeholder="Enter API Secret..." value="loaded_from_env_file_secret">
+                        </div>
+                        
+                        <!-- Endpoint Setting -->
+                        <div class="input-group">
+                            <label>Binance Target Endpoint</label>
+                            <div class="select-wrapper">
+                                <select id="settings-endpoint">
+                                    <option value="testnet">Binance Futures Testnet (https://testnet.binancefuture.com)</option>
+                                    <option value="production" disabled>Binance Futures Live (Disabled in Testnet Mode)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- RecvWindow setting -->
+                        <div class="input-group">
+                            <label>RecvWindow Parameter (ms)</label>
+                            <input type="number" id="settings-recvwindow" value="6000">
+                        </div>
+
+                        <!-- Save settings action -->
+                        <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 10px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Credentials
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification system -->
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
